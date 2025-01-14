@@ -1,9 +1,9 @@
 import { Action, Actions, BorderNode, DockLocation, IJsonModel, Model, Node, Orientation, Rect, RowNode, TabNode, TabSetNode } from "../src";
 
 /*
-* The textRendered tabs: a representation of the model 'rendered' to a list of tab paths 
-* where /ts0/t1[One]* is tab index 1 in tabset 0 of the root row with name=One and its selected (ie. path + tabname and selected indicator))
-*/
+ * The textRendered tabs: a representation of the model 'rendered' to a list of tab paths
+ * where /ts0/t1[One]* is tab index 1 in tabset 0 of the root row with name=One and its selected (ie. path + tabname and selected indicator))
+ */
 let tabsArray: string[] = []; // the rendered tabs as an array
 let tabs = ""; // the rendered tabs array as a comma separated string
 let pathMap: Record<string, Node> = {}; // maps tab path (e.g /ts1/t0) to the actual Node
@@ -11,31 +11,27 @@ let pathMap: Record<string, Node> = {}; // maps tab path (e.g /ts1/t0) to the ac
 let model: Model;
 
 describe("Tree", function () {
-
     context("Actions", () => {
         // afterEach(() => {
         //     checkLayout(model);
         // });
 
         context("Add", () => {
-
             it("empty tabset", function () {
-                model = Model.fromJson(
-                    {
-                        global: {},
-                        layout: {
-                            type: "row",
-                            children: [
-                                {
-                                    type: "tabset",
-                                    id: "1",
-                                    enableDeleteWhenEmpty: false,
-                                    children: []
-                                }
-                            ]
-                        }
-                    }
-                );
+                model = Model.fromJson({
+                    global: {},
+                    layout: {
+                        type: "row",
+                        children: [
+                            {
+                                type: "tabset",
+                                id: "1",
+                                enableDeleteWhenEmpty: false,
+                                children: [],
+                            },
+                        ],
+                    },
+                });
 
                 doAction(Actions.addNode({ id: "2", name: "newtab1", component: "grid" }, "1", DockLocation.CENTER, -1));
 
@@ -315,7 +311,6 @@ describe("Tree", function () {
                 expect(tabs).equal("/b/top/t0[top1],/b/bottom/t0[bottom1],/b/bottom/t1[bottom2],/b/left/t0[left1],/b/right/t0[right1],/b/right/t1[One]");
             });
 
-
             it("move from border top", () => {
                 const fromId = tab("/b/top/t0").getId();
                 const toId = tab("/ts0").getId();
@@ -346,8 +341,7 @@ describe("Tree", function () {
         });
 
         context("Delete", () => {
-            beforeEach(() => {
-            });
+            beforeEach(() => {});
 
             it("delete from tabset with 1 tab", () => {
                 model = Model.fromJson(threeTabs);
@@ -412,7 +406,6 @@ describe("Tree", function () {
                 doAction(Actions.deleteTab(tab("/b/right/t0").getId()));
                 expect(tabs).equal("/ts0/t0[One]*");
             });
-
         });
 
         context("Other Actions", () => {
@@ -491,7 +484,6 @@ describe("Tree", function () {
                 doAction(Actions.updateModelAttributes({ splitterSize: 10 }));
                 expect(model.getSplitterSize()).equals(10);
             });
-
         });
     });
 
@@ -504,14 +496,18 @@ describe("Tree", function () {
 
         it("close tab", () => {
             let closed = false;
-            tab("/ts0/t0").setEventListener("close", () => { closed = true; })
+            tab("/ts0/t0").setEventListener("close", () => {
+                closed = true;
+            });
             doAction(Actions.deleteTab(tab("/ts0/t0").getId()));
             expect(closed).equals(true);
         });
 
         it("save tab", () => {
             let saved = false;
-            tab("/ts0/t0").setEventListener("save", () => { saved = true; })
+            tab("/ts0/t0").setEventListener("save", () => {
+                saved = true;
+            });
             model.toJson();
             expect(saved).equals(true);
         });
@@ -562,11 +558,9 @@ describe("Tree", function () {
         //     expect(resized).equals(true);
         // });
     });
-    
 });
 
-
-// ---------------------------- helpers ------------------------ 
+// ---------------------------- helpers ------------------------
 
 function doAction(action: Action) {
     model.doAction(action);
@@ -592,12 +586,12 @@ function border(path: string) {
 
 function tabsMatch(regExStr: string) {
     const regex = new RegExp(regExStr);
-    return tabsArray.filter(t => regex.test(t)).join(",");
+    return tabsArray.filter((t) => regex.test(t)).join(",");
 }
 
 function tabsDontMatch(regExStr: string) {
     const regex = new RegExp(regExStr);
-    return tabsArray.filter(t => !regex.test(t)).join(",");
+    return tabsArray.filter((t) => !regex.test(t)).join(",");
 }
 
 function textRender(model: Model) {
@@ -623,18 +617,18 @@ function textRenderInner(pathMap: Record<string, Node>, path: string, children: 
         } else if (c instanceof TabNode) {
             const newpath = path + "/t" + index++;
             pathMap[newpath] = c;
-            const parent = c.getParent() as (BorderNode | TabSetNode);
+            const parent = c.getParent() as BorderNode | TabSetNode;
             const selected = parent.getSelectedNode() === c;
             tabsArray.push(newpath + "[" + c.getName() + "]" + (selected ? "*" : ""));
             textRenderInner(pathMap, newpath, c.getChildren());
         } else if (c instanceof RowNode) {
-            const newpath = path + ((c.getOrientation() === Orientation.HORZ) ? "/r" : "/c") + index++;
+            const newpath = path + (c.getOrientation() === Orientation.HORZ ? "/r" : "/c") + index++;
             pathMap[newpath] = c;
             textRenderInner(pathMap, newpath, c.getChildren());
-        // } else if (c instanceof SplitterNode) {
-        //     const newpath = path + "/s" + splitterIndex++;
-        //     pathMap[newpath] = c;
-        //     textRenderInner(pathMap, newpath, c.getChildren());
+            // } else if (c instanceof SplitterNode) {
+            //     const newpath = path + "/s" + splitterIndex++;
+            //     pathMap[newpath] = c;
+            //     textRenderInner(pathMap, newpath, c.getChildren());
         }
     });
 }
@@ -699,8 +693,8 @@ const twoTabs: IJsonModel = {
                         type: "tab",
                         name: "One",
                         component: "text",
-                    }
-                ]
+                    },
+                ],
             },
             {
                 type: "tabset",
@@ -711,65 +705,65 @@ const twoTabs: IJsonModel = {
                         type: "tab",
                         name: "Two",
                         component: "text",
-                    }
-                ]
-            }
-        ]
-    }
+                    },
+                ],
+            },
+        ],
+    },
 };
 
 const withBorders: IJsonModel = {
     global: {},
     borders: [
         {
-            "type": "border",
-            "location": "top",
-            "children": [
+            type: "border",
+            location: "top",
+            children: [
                 {
-                    "type": "tab",
-                    "name": "top1",
-                    "component": "text"
-                }
-            ]
+                    type: "tab",
+                    name: "top1",
+                    component: "text",
+                },
+            ],
         },
         {
-            "type": "border",
-            "location": "bottom",
-            "children": [
+            type: "border",
+            location: "bottom",
+            children: [
                 {
-                    "type": "tab",
-                    "name": "bottom1",
-                    "component": "text"
+                    type: "tab",
+                    name: "bottom1",
+                    component: "text",
                 },
                 {
-                    "type": "tab",
-                    "name": "bottom2",
-                    "component": "text"
-                }
-            ]
+                    type: "tab",
+                    name: "bottom2",
+                    component: "text",
+                },
+            ],
         },
         {
-            "type": "border",
-            "location": "left",
-            "children": [
+            type: "border",
+            location: "left",
+            children: [
                 {
-                    "type": "tab",
-                    "name": "left1",
-                    "component": "text"
-                }
-            ]
+                    type: "tab",
+                    name: "left1",
+                    component: "text",
+                },
+            ],
         },
         {
-            "type": "border",
-            "location": "right",
-            "children": [
+            type: "border",
+            location: "right",
+            children: [
                 {
-                    "type": "tab",
-                    "name": "right1",
-                    "component": "text"
-                }
-            ]
-        }
+                    type: "tab",
+                    name: "right1",
+                    component: "text",
+                },
+            ],
+        },
     ],
     layout: {
         type: "row",
@@ -783,11 +777,11 @@ const withBorders: IJsonModel = {
                         type: "tab",
                         name: "One",
                         component: "text",
-                    }
-                ]
-            }
-        ]
-    }
+                    },
+                ],
+            },
+        ],
+    },
 };
 
 const threeTabs: IJsonModel = {
@@ -805,8 +799,8 @@ const threeTabs: IJsonModel = {
                         type: "tab",
                         name: "One",
                         component: "text",
-                    }
-                ]
+                    },
+                ],
             },
             {
                 type: "tabset",
@@ -818,8 +812,8 @@ const threeTabs: IJsonModel = {
                         name: "Two",
                         icon: "/test/images/settings.svg",
                         component: "text",
-                    }
-                ]
+                    },
+                ],
             },
             {
                 type: "tabset",
@@ -829,10 +823,9 @@ const threeTabs: IJsonModel = {
                         type: "tab",
                         name: "Three",
                         component: "text",
-                    }
-                ]
-            }
-
-        ]
-    }
+                    },
+                ],
+            },
+        ],
+    },
 };

@@ -1,5 +1,4 @@
-
-const path = require('path');
+const path = require("path");
 module.exports = {
     mode: "development",
     entry: {
@@ -38,9 +37,9 @@ module.exports = {
             },
             {
                 test: /\.(woff|woff2|eot|ttf|otf)$/i,
-                type: 'asset/resource',  // This handles font files
+                type: "asset/resource", // This handles font files
                 generator: {
-                    filename: 'fonts/[name][hash][ext]',  // Place fonts in a "fonts" folder inside the output directory
+                    filename: "fonts/[name][hash][ext]", // Place fonts in a "fonts" folder inside the output directory
                 },
             },
         ],
