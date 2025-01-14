@@ -945,8 +945,9 @@ const findAllTabSets = () => {
 }
 
 const findPath = (path: string) => {
-    return cy.get("[data-layout-path="" + path + ""]");
-}
+    // return cy.get("[data-layout-path="" + path + ""]");
+    return cy.get('[data-layout-path="' + path + '"]');
+};
 
 const findTabButton = (path: string, index: number) => {
     return findPath(path + "/tb" + index);
