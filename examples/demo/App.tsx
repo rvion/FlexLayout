@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as Prism from "prismjs";
 import { createRoot } from "react-dom/client";
 import { Action, Actions, BorderNode, DropInfo, IJsonTabNode, ITabRenderValues, ITabSetRenderValues, Layout, Model, Node, TabNode, TabSetNode } from "../../src/index";
 import { NewFeatures } from "./NewFeatures";
@@ -22,7 +21,19 @@ var fields = ["Name", "Field1", "Field2", "Field3", "Field4", "Field5"];
 
 const ContextExample = React.createContext("");
 
-class App extends React.Component<any, { layoutFile: string | null; model: Model | null; json?: string; adding: boolean; fontSize: string; realtimeResize: boolean }> {
+class App extends React.Component<
+    any,
+    {
+        layoutFile: string | null;
+        model: Model | null;
+        json?: string;
+        adding: boolean;
+        fontSize: string;
+        realtimeResize: boolean;
+        showLayout: boolean;
+        popoutClassName: string;
+    }
+> {
     loadingLayoutName?: string;
     nextGridIndex: number = 1;
     showingPopupMenu: boolean = false;
@@ -31,7 +42,15 @@ class App extends React.Component<any, { layoutFile: string | null; model: Model
 
     constructor(props: any) {
         super(props);
-        this.state = { layoutFile: null, model: null, adding: false, fontSize: "medium", realtimeResize: false };
+        this.state = {
+            layoutFile: null,
+            model: null,
+            adding: false,
+            fontSize: "medium",
+            realtimeResize: false,
+            showLayout: false,
+            popoutClassName: "flexlayout__theme_light",
+        };
         this.layoutRef = React.createRef();
 
         // save layout when unloading page
@@ -86,18 +105,18 @@ class App extends React.Component<any, { layoutFile: string | null; model: Model
         // you can control where nodes can be dropped
         //model.setOnAllowDrop(this.allowDrop);
 
-        const html = Prism.highlight(jsonText, Prism.languages.javascript, "javascript");
-        this.setState({ layoutFile: this.loadingLayoutName!, model: model, json: html });
+        // const html = Prism.highlight(jsonText, Prism.languages.javascript, "javascript");
+        this.setState({ layoutFile: this.loadingLayoutName!, model: model, json: jsonText });
     };
 
     allowDrop = (dragNode: TabNode | TabSetNode, dropInfo: DropInfo) => {
         let dropNode = dropInfo.node;
 
         // prevent non-border tabs dropping into borders
-        if (dropNode.getType() === "border" && (dragNode.getParent() == null || dragNode.getParent()!.getType() != "border")) return false;
+        if (dropNode.getType() === "border" && (dragNode.getParent() == null || dragNode.getParent()!.getType() !== "border")) return false;
 
         // prevent border tabs dropping into main layout
-        if (dropNode.getType() !== "border" && dragNode.getParent() != null && dragNode.getParent()!.getType() == "border") return false;
+        if (dropNode.getType() !== "border" && dragNode.getParent() != null && dragNode.getParent()!.getType() === "border") return false;
 
         return true;
     };
@@ -126,6 +145,12 @@ class App extends React.Component<any, { layoutFile: string | null; model: Model
     onRealtimeResize = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({
             realtimeResize: event.target.checked,
+        });
+    };
+
+    onShowLayout = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({
+            showLayout: event.target.checked,
         });
     };
 
@@ -331,41 +356,10 @@ class App extends React.Component<any, { layoutFile: string | null; model: Model
 
     onThemeChange = (event: React.FormEvent) => {
         var target = event.target as HTMLSelectElement;
-
-        let flexlayout_stylesheet: any = window.document.getElementById("flexlayout-stylesheet");
-        let page_stylesheet = window.document.getElementById("page-stylesheet");
-        let index = flexlayout_stylesheet.href.lastIndexOf("/");
-        let newAddress = flexlayout_stylesheet.href.substr(0, index);
-
-        let s1 = document.createElement("link");
-        s1.setAttribute("id", "flexlayout-stylesheet");
-        s1.setAttribute("rel", "stylesheet");
-        s1.setAttribute("href", newAddress + "/" + target.value + ".css");
-
-        let s2 = document.createElement("link");
-        s2.setAttribute("id", "page-stylesheet");
-        s2.setAttribute("rel", "stylesheet");
-        s2.setAttribute("href", target.value + ".css");
-
-        const promises: Promise<boolean>[] = [];
-        promises.push(
-            new Promise((resolve) => {
-                s1.onload = () => resolve(true);
-            }),
-        );
-        promises.push(
-            new Promise((resolve) => {
-                s2.onload = () => resolve(true);
-            }),
-        );
-        document.head.appendChild(s1);
-        document.head.appendChild(s2);
-
-        Promise.all(promises).then(() => {
-            document.head.removeChild(flexlayout_stylesheet);
-            document.head.removeChild(page_stylesheet!);
-            this.forceUpdate();
-        });
+        const themeClassName = "flexlayout__theme_" + target.value;
+        document.documentElement.className = themeClassName;
+        // need to set popout top level class name to new theme
+        this.setState({ popoutClassName: themeClassName });
     };
 
     onFontSizeChange = (event: React.FormEvent) => {
@@ -431,6 +425,7 @@ class App extends React.Component<any, { layoutFile: string | null; model: Model
                 <Layout
                     ref={this.layoutRef}
                     model={this.state.model}
+                    popoutClassName={this.state.popoutClassName}
                     popoutWindowName='Demo Popout'
                     factory={this.factory}
                     onAction={this.onAction}
@@ -473,74 +468,78 @@ class App extends React.Component<any, { layoutFile: string | null; model: Model
         }
 
         return (
-            <React.StrictMode>
-                <ContextExample.Provider value='from context'>
-                    <div className='app'>
-                        <div className='toolbar' dir='ltr'>
-                            <select className='toolbar_control' onChange={this.onSelectLayout}>
-                                <option value='default'>Default</option>
-                                <option value='newfeatures'>New Features</option>
-                                <option value='simple'>Simple</option>
-                                <option value='mosaic'>Mosaic Style</option>
-                                <option value='sub'>SubLayout</option>
-                                <option value='complex'>Complex</option>
-                            </select>
-                            <button className='toolbar_control' onClick={this.onReloadFromFile} style={{ marginLeft: 5 }}>
-                                Reload
-                            </button>
-                            <div style={{ flexGrow: 1 }}></div>
-                            <span style={{ fontSize: "14px" }}>Realtime resize</span>
-                            <input name='realtimeResize' type='checkbox' checked={this.state.realtimeResize} onChange={this.onRealtimeResize} />
-                            <select className='toolbar_control' style={{ marginLeft: 5 }} onChange={this.onFontSizeChange} defaultValue='medium'>
-                                <option value='xx-small'>Size xx-small</option>
-                                <option value='x-small'>Size x-small</option>
-                                <option value='small'>Size small</option>
-                                <option value='medium'>Size medium</option>
-                                <option value='large'>Size large</option>
-                                <option value='8px'>Size 8px</option>
-                                <option value='10px'>Size 10px</option>
-                                <option value='12px'>Size 12px</option>
-                                <option value='14px'>Size 14px</option>
-                                <option value='16px'>Size 16px</option>
-                                <option value='18px'>Size 18px</option>
-                                <option value='20px'>Size 20px</option>
-                                <option value='25px'>Size 25px</option>
-                                <option value='30px'>Size 30px</option>
-                            </select>
-                            <select className='toolbar_control' style={{ marginLeft: 5 }} defaultValue='light' onChange={this.onThemeChange}>
-                                <option value='light'>Light</option>
-                                <option value='underline'>Underline</option>
-                                <option value='gray'>Gray</option>
-                                <option value='dark'>Dark</option>
-                                <option value='rounded'>Rounded</option>
-                            </select>
-                            {/* <button className="toolbar_control" style={{ marginLeft: 5 }} onClick={this.onNewWindow}>New Window</button> */}
-                            <button className='toolbar_control' style={{ marginLeft: 5 }} onClick={this.onShowLayoutClick}>
-                                Show Layout JSON in Console
-                            </button>
-                            <button
-                                className='toolbar_control drag-from'
-                                draggable={true}
-                                style={{ height: "30px", marginLeft: 5, border: "none", outline: "none" }}
-                                title='Add tab by starting a drag on a draggable element'
-                                onDragStart={this.onDragStart}
-                            >
-                                Add Drag
-                            </button>
-                            <button
-                                className='toolbar_control'
-                                disabled={this.state.adding}
-                                style={{ marginLeft: 5 }}
-                                title='Add using Layout.addTabToActiveTabSet'
-                                onClick={this.onAddActiveClick}
-                            >
-                                Add Active
-                            </button>
-                        </div>
-                        <div className='contents'>{contents}</div>
+            // commented out strictmode until: extra effect in strict mode is fixed see: https://github.com/facebook/react/issues/29585
+            // <React.StrictMode>
+            <ContextExample.Provider value='from context'>
+                <div className='app'>
+                    <div className='toolbar' dir='ltr'>
+                        <select className='toolbar_control' onChange={this.onSelectLayout}>
+                            <option value='default'>Default</option>
+                            <option value='newfeatures'>New Features</option>
+                            <option value='simple'>Simple</option>
+                            <option value='mosaic'>Mosaic Style</option>
+                            <option value='sub'>SubLayout</option>
+                            <option value='complex'>Complex</option>
+                        </select>
+                        <button className='toolbar_control' onClick={this.onReloadFromFile} style={{ marginLeft: 5 }}>
+                            Reload
+                        </button>
+                        <div style={{ flexGrow: 1 }}></div>
+                        <span style={{ fontSize: "14px" }}>Realtime resize</span>
+                        <input name='realtimeResize' type='checkbox' checked={this.state.realtimeResize} onChange={this.onRealtimeResize} />
+                        <span style={{ marginLeft: 5, fontSize: "14px" }}>Show layout</span>
+                        <input name='show layout' type='checkbox' checked={this.state.showLayout} onChange={this.onShowLayout} />
+                        <select className='toolbar_control' style={{ marginLeft: 5 }} onChange={this.onFontSizeChange} defaultValue='medium'>
+                            <option value='xx-small'>Size xx-small</option>
+                            <option value='x-small'>Size x-small</option>
+                            <option value='small'>Size small</option>
+                            <option value='medium'>Size medium</option>
+                            <option value='large'>Size large</option>
+                            <option value='8px'>Size 8px</option>
+                            <option value='10px'>Size 10px</option>
+                            <option value='12px'>Size 12px</option>
+                            <option value='14px'>Size 14px</option>
+                            <option value='16px'>Size 16px</option>
+                            <option value='18px'>Size 18px</option>
+                            <option value='20px'>Size 20px</option>
+                            <option value='25px'>Size 25px</option>
+                            <option value='30px'>Size 30px</option>
+                        </select>
+                        <select className='toolbar_control' style={{ marginLeft: 5 }} defaultValue='light' onChange={this.onThemeChange}>
+                            <option value='light'>Light</option>
+                            <option value='underline'>Underline</option>
+                            <option value='gray'>Gray</option>
+                            <option value='dark'>Dark</option>
+                            <option value='rounded'>Rounded</option>
+                        </select>
+                        {/* <button className="toolbar_control" style={{ marginLeft: 5 }} onClick={this.onNewWindow}>New Window</button> */}
+                        <button className='toolbar_control' style={{ marginLeft: 5 }} onClick={this.onShowLayoutClick}>
+                            Show Layout JSON in Console
+                        </button>
+                        <button
+                            className='toolbar_control drag-from'
+                            draggable={true}
+                            style={{ height: "30px", marginLeft: 5, border: "none", outline: "none" }}
+                            title='Add tab by starting a drag on a draggable element'
+                            onDragStart={this.onDragStart}
+                        >
+                            Add Drag
+                        </button>
+                        <button
+                            className='toolbar_control'
+                            disabled={this.state.adding}
+                            style={{ marginLeft: 5 }}
+                            title='Add using Layout.addTabToActiveTabSet'
+                            onClick={this.onAddActiveClick}
+                        >
+                            Add Active
+                        </button>
                     </div>
-                </ContextExample.Provider>
-            </React.StrictMode>
+                    <div className={"contents" + (this.state.showLayout ? " showLayout" : "")}>{contents}</div>
+                    <div className='contents'>{contents}</div>
+                </div>
+            </ContextExample.Provider>
+            //</React.StrictMode>
         );
     }
 
@@ -580,7 +579,7 @@ class SimpleTable extends React.Component<{ fields: any; node: Node; data: any; 
         });
 
         var rows = [];
-        for (var i = 0; i < this.props.data.length; i++) {
+        for (let i = 0; i < this.props.data.length; i++) {
             var row = this.props.fields.map((field: any) => <td key={field}>{this.props.data[i][field]}</td>);
             rows.push(<tr key={i}>{row}</tr>);
         }

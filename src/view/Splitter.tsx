@@ -39,8 +39,8 @@ export const Splitter = (props: ISplitterProps) => {
     let extra = node.getModel().getSplitterExtra();
 
     if (!isDesktop()) {
-        // make hit test area on mobile at least 30px
-        extra = Math.max(30, extra + size) - size;
+        // make hit test area on mobile at least 20px
+        extra = Math.max(20, extra + size) - size;
     }
 
     React.useEffect(() => {

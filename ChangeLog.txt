@@ -1,3 +1,29 @@
+0.8.6
+Restructured scss files to remove use of deprecated @import rule
+Added combined.css containing all themes.
+Updated demo to use combined.css for simple theme switching using class names
+Added option in demo to show the layout structure
+
+0.8.5
+Changed the mini scrollbar to only show when tabs are hovered over 
+
+0.8.4
+Added attribute 'enableTabScrollbar' to TabSet and Border nodes 
+  Enabling this attribute will show a mini 'scrollbar' for the tabs to indicate the scroll position
+  See the Demo apps default layout for an example.
+
+0.8.3
+Prevent sticky buttons scrolling when there are no tabs
+Fix border 'show' attribute
+Removed code to adjust popout positions when loading
+
+0.8.2
+Updated dependencies 
+Enabled use with React 19
+Removed strict mode from demo due to bug in React 19 (https://github.com/facebook/react/issues/29585) causing
+  tabs to re-mount when moved
+Used CodeSandbox in README.md since react 19 doesn't create UMD versions needed by JSFiddle.
+
 0.8.1
 Fixed enableDrag on tab and tabset nodes.
 Fixed calc for min/max tabset height from min/max tab height.
