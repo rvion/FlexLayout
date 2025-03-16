@@ -14,6 +14,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import { NOTNULL } from "./NOTNULL";
 // import MUIComponent from "./MUIComponent";
 // import MUIDataGrid from "./MUIDataGrid";
 
@@ -21,12 +22,12 @@ var fields = ["Name", "Field1", "Field2", "Field3", "Field4", "Field5"];
 
 const ContextExample = React.createContext('');
 
-class App extends React.Component<any, { 
-    layoutFile: string | null, 
-    model: Model | null, 
-    json?: string, 
-    adding: boolean, 
-    fontSize: string, 
+class App extends React.Component<any, {
+    layoutFile: string | null,
+    model: Model | null,
+    json?: string,
+    adding: boolean,
+    fontSize: string,
     realtimeResize: boolean,
     showLayout: boolean,
     popoutClassName: string
@@ -530,7 +531,7 @@ class App extends React.Component<any, {
             var rec: { [key: string]: any; } = {};
             rec.Name = this.randomString(5, "BCDFGHJKLMNPQRSTVWXYZ");
             for (var j = 1; j < fields.length; j++) {
-                rec[fields[j]] = (1.5 + Math.random() * 2).toFixed(2);
+                rec[NOTNULL(fields[j])] = (1.5 + Math.random() * 2).toFixed(2);
             }
             data.push(rec);
         }
