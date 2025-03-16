@@ -112,11 +112,11 @@ class App extends React.Component<any, {
         let dropNode = dropInfo.node;
 
         // prevent non-border tabs dropping into borders
-        if (dropNode.getType() === "border" && (dragNode.getParent() == null || dragNode.getParent()!.getType() != "border"))
+        if (dropNode.getType() === "border" && (dragNode.getParent() == null || dragNode.getParent()!.getType() !== "border"))
             return false;
 
         // prevent border tabs dropping into main layout
-        if (dropNode.getType() !== "border" && (dragNode.getParent() != null && dragNode.getParent()!.getType() == "border"))
+        if (dropNode.getType() !== "border" && (dragNode.getParent() != null && dragNode.getParent()!.getType() === "border"))
             return false;
 
         return true;
@@ -559,7 +559,7 @@ class SimpleTable extends React.Component<{ fields: any, node: Node, data: any, 
         });
 
         var rows = [];
-        for (var i = 0; i < this.props.data.length; i++) {
+        for (let i = 0; i < this.props.data.length; i++) {
             var row = this.props.fields.map((field: any) => <td key={field}>{this.props.data[i][field]}</td>);
             rows.push(<tr key={i}>{row}</tr>);
         }
