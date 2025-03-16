@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Model } from "../../src/index";
-import * as Prism from "prismjs";
+// import * as Prism from "prismjs";
 
 export function JsonView({ model }: { model: Model }) {
 
@@ -26,7 +26,7 @@ export function JsonView({ model }: { model: Model }) {
 
   const update = () => {
     const jsonText = JSON.stringify(model.toJson(), null, "\t");
-    const newJson = Prism.highlight(jsonText, Prism.languages.javascript, 'javascript');
+        const newJson = jsonText; // Prism.highlight(jsonText, Prism.languages.javascript, 'javascript');
     setJson(newJson);
   }
 

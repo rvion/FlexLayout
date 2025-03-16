@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as Prism from "prismjs";
 import { createRoot } from "react-dom/client";
 import { Action, Actions, BorderNode, DropInfo, IJsonTabNode, ITabRenderValues, ITabSetRenderValues, Layout, Model, Node, TabNode, TabSetNode } from "../../src/index";
 import { NewFeatures } from "./NewFeatures";
@@ -7,16 +6,16 @@ import { showPopup } from "./PopupMenu";
 import { SimpleForm } from "./SimpleForm";
 import { Utils } from "./Utils";
 import "prismjs/themes/prism-coy.css";
-import BarChart from "./chart";
-import MapComponent from "./openlayter";
-import { AGGridExample } from "./aggrid";
+// import BarChart from "./chart";
+// import MapComponent from "./openlayter";
+// import { AGGridExample } from "./aggrid";
 import { JsonView } from "./JsonView";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import MUIComponent from "./MUIComponent";
-import MUIDataGrid from "./MUIDataGrid";
+// import MUIComponent from "./MUIComponent";
+// import MUIDataGrid from "./MUIDataGrid";
 
 var fields = ["Name", "Field1", "Field2", "Field3", "Field4", "Field5"];
 
@@ -41,15 +40,15 @@ class App extends React.Component<any, {
 
     constructor(props: any) {
         super(props);
-        this.state = { 
-            layoutFile: null, 
-            model: null, 
-            adding: false, 
+        this.state = {
+            layoutFile: null,
+            model: null,
+            adding: false,
             fontSize: "medium",
             realtimeResize: false,
             showLayout: false,
             popoutClassName: "flexlayout__theme_light"
-            };
+        };
         this.layoutRef = React.createRef();
 
         // save layout when unloading page
@@ -61,7 +60,7 @@ class App extends React.Component<any, {
     componentDidMount() {
         this.loadLayout("default", false);
 
-        // use to generate json typescript interfaces 
+        // use to generate json typescript interfaces
         // Model.toTypescriptInterfaces();
     }
 
@@ -105,9 +104,9 @@ class App extends React.Component<any, {
         // you can control where nodes can be dropped
         //model.setOnAllowDrop(this.allowDrop);
 
-        const html = Prism.highlight(jsonText, Prism.languages.javascript, 'javascript');
-        this.setState({ layoutFile: this.loadingLayoutName!, model: model, json: html });
-    }
+        // const html = Prism.highlight(jsonText, Prism.languages.javascript, "javascript");
+        this.setState({ layoutFile: this.loadingLayoutName!, model: model, json: jsonText });
+    };
 
     allowDrop = (dragNode: (TabNode | TabSetNode), dropInfo: DropInfo) => {
         let dropNode = dropInfo.node;
@@ -160,13 +159,13 @@ class App extends React.Component<any, {
     onRenderDragRect = (content: React.ReactNode | undefined, node?: Node, json?: IJsonTabNode) => {
         if (this.state.layoutFile === "newfeatures") {
             return (<>
-                {content}
-                <div style={{ whiteSpace: "pre" }}>
-                    <br />
+                    {content}
+                    <div style={{ whiteSpace: "pre" }}>
+                        <br />
                     This is a customized<br />
-                    drag rectangle
-                </div>
-            </>
+                        drag rectangle
+                    </div>
+                </>
             );
         } else {
             return undefined; // use default rendering
@@ -220,7 +219,7 @@ class App extends React.Component<any, {
                 component: "multitype"
             },
             onDrop: (node?: Node, event?: React.DragEvent<HTMLElement>) => {
-                if (!node || !event) return;  // aborted drag
+                if (!node || !event) return; // aborted drag
 
                 if (node instanceof TabNode) {
                     if (event.dataTransfer) {
@@ -275,35 +274,32 @@ class App extends React.Component<any, {
         var component = node.getComponent();
 
         if (component === "json") {
-            return (<JsonView model={this.state.model!}/>);
-        }
-        else if (component === "simpleform") {
-            return <SimpleForm />
-        }
-        else if (component === "mui") {
-            return <MUIComponent />
-        }
-        else if (component === "muigrid") {
-            return <MUIDataGrid />
-        }
-        else if (component === "aggrid") {
-            return <AGGridExample />
-        }
-        else if (component === "chart") {
-            return <BarChart />
-        }
-        else if (component === "map") {
-            return <MapComponent />
-        }
-        else if (component === "grid") {
+            return <JsonView model={this.state.model!} />;
+        } else if (component === "simpleform") {
+            return <SimpleForm />;
+            // }
+            // else if (component === "mui") {
+            //     return <MUIComponent />
+            // }
+            // else if (component === "muigrid") {
+            //     return <MUIDataGrid />
+            // }
+            // else if (component === "aggrid") {
+            //     return <AGGridExample />
+            // }
+            // else if (component === "chart") {
+            //     return <BarChart />
+            // }
+            // else if (component === "map") {
+            //     return <MapComponent />;
+        } else if (component === "grid") {
             if (node.getExtraData().data == null) {
                 // create data in node extra data first time accessed
                 node.getExtraData().data = this.makeFakeData();
             }
 
             return <SimpleTable fields={fields} data={node.getExtraData().data} node={node} onDragStart={this.onTableDragStart} />;
-        }
-        else if (component === "sub") {
+        } else if (component === "sub") {
             var model = node.getExtraData().model;
             if (model == null) {
                 node.getExtraData().model = Model.fromJson(node.getConfig().model);
@@ -312,37 +308,30 @@ class App extends React.Component<any, {
                 node.setEventListener("save", (p: any) => {
                     this.state.model!.doAction(Actions.updateNodeAttributes(node.getId(), { config: { model: node.getExtraData().model.toJson() } }));
                     //  node.getConfig().model = node.getExtraData().model.toJson();
-                }
-                );
+                });
             }
 
             return <Layout model={model} factory={this.factory} />;
-        }
-        else if (component === "text") {
+        } else if (component === "text") {
             try {
                 return <div dangerouslySetInnerHTML={{ __html: node.getConfig().text }} />;
             } catch (e) {
                 console.log(e);
             }
-        }
-        else if (component === "newfeatures") {
+        } else if (component === "newfeatures") {
             return <NewFeatures />;
-        }
-        else if (component === "multitype") {
+        } else if (component === "multitype") {
             try {
                 const config = node.getConfig();
                 if (config.type === "url") {
                     return <iframe title={node.getId()} src={config.data} style={{ display: "block", border: "none", boxSizing: "border-box" }} width="100%" height="100%" />;
                 } else if (config.type === "html") {
-                    return (<div dangerouslySetInnerHTML={{ __html: config.data }} />);
+                    return <div dangerouslySetInnerHTML={{ __html: config.data }} />;
                 } else if (config.type === "text") {
-                    return (
-                        <textarea style={{ position: "absolute", width: "100%", height: "100%", resize: "none", boxSizing: "border-box", border: "none" }}
-                            defaultValue={config.data}
-                        />);
+                    return <textarea style={{ position: "absolute", width: "100%", height: "100%", resize: "none", boxSizing: "border-box", border: "none" }} defaultValue={config.data} />;
                 }
             } catch (e) {
-                return (<div>{String(e)}</div>);
+                return <div>{String(e)}</div>;
             }
         }
 
@@ -360,10 +349,10 @@ class App extends React.Component<any, {
 
     onThemeChange = (event: React.FormEvent) => {
         var target = event.target as HTMLSelectElement;
-        const themeClassName = "flexlayout__theme_"+ target.value;
+        const themeClassName = "flexlayout__theme_" + target.value;
         document.documentElement.className = themeClassName;
         // need to set popout top level class name to new theme
-        this.setState({popoutClassName: themeClassName});
+        this.setState({ popoutClassName: themeClassName });
     }
 
     onFontSizeChange = (event: React.FormEvent) => {
@@ -398,18 +387,18 @@ class App extends React.Component<any, {
                     />);
 
                 // put overflow button before + button (default is after)
-                // renderValues.overflowPosition=0    
+                // renderValues.overflowPosition=0
             }
         }
     }
 
     onTabSetPlaceHolder(node: TabSetNode) {
         return <div
-            key="placeholder"
-            style={{
-                display: "flex",
-                flexGrow: 1,
-                alignItems: "center",
+                key="placeholder"
+                style={{
+                    display: "flex",
+                    flexGrow: 1,
+                    alignItems: "center",
                 justifyContent: "center"
             }}>Drag tabs to this area</div>;
     }
@@ -419,72 +408,72 @@ class App extends React.Component<any, {
         let contents: React.ReactNode = "loading ...";
         if (this.state.model !== null) {
             contents = <Layout
-            ref={this.layoutRef}
-            model={this.state.model}
-            popoutClassName={this.state.popoutClassName}
-            popoutWindowName="Demo Popout"
-            factory={this.factory}
-                onAction={this.onAction}
-                onModelChange={this.onModelChange}
-                onRenderTab={this.onRenderTab}
-                onRenderTabSet={this.onRenderTabSet}
-                onRenderDragRect={this.onRenderDragRect}
-                onExternalDrag={this.onExternalDrag}
-                realtimeResize={this.state.realtimeResize}
-                onContextMenu={this.state.layoutFile === "newfeatures" ? this.onContextMenu : undefined}
-                onAuxMouseClick={this.state.layoutFile === "newfeatures" ? this.onAuxMouseClick : undefined}
-                // icons={{
-                //     more: (node: (TabSetNode | BorderNode), hiddenTabs: { node: TabNode; index: number }[]) => {
-                //         return (<div style={{fontSize:".7em"}}>{hiddenTabs.length}</div>);
-                //     }
-                // }}
-                onTabSetPlaceHolder={this.onTabSetPlaceHolder}
+                    ref={this.layoutRef}
+                    model={this.state.model}
+                    popoutClassName={this.state.popoutClassName}
+                    popoutWindowName="Demo Popout"
+                    factory={this.factory}
+                    onAction={this.onAction}
+                    onModelChange={this.onModelChange}
+                    onRenderTab={this.onRenderTab}
+                    onRenderTabSet={this.onRenderTabSet}
+                    onRenderDragRect={this.onRenderDragRect}
+                    onExternalDrag={this.onExternalDrag}
+                    realtimeResize={this.state.realtimeResize}
+                    onContextMenu={this.state.layoutFile === "newfeatures" ? this.onContextMenu : undefined}
+                    onAuxMouseClick={this.state.layoutFile === "newfeatures" ? this.onAuxMouseClick : undefined}
+                    // icons={{
+                    //     more: (node: (TabSetNode | BorderNode), hiddenTabs: { node: TabNode; index: number }[]) => {
+                    //         return (<div style={{fontSize:".7em"}}>{hiddenTabs.length}</div>);
+                    //     }
+                    // }}
+                    onTabSetPlaceHolder={this.onTabSetPlaceHolder}
 
-            // classNameMapper={
-            //     className => {
-            //         console.log(className);
-            //         if (className === "flexlayout__tab_button--selected") {
-            //             className = "override__tab_button--selected";
-            //         }
-            //         return className;
-            //     }
-            // }
-            // i18nMapper = {
-            //     (id, param?) => {
-            //         if (id === I18nLabel.Move_Tab) {
-            //             return `move this tab: ${param}`;
-            //         } else if (id === I18nLabel.Move_Tabset) {
-            //             return `move this tabset`
-            //         }
-            //         return undefined;
-            //     }
-            // }
+                    // classNameMapper={
+                    //     className => {
+                    //         console.log(className);
+                    //         if (className === "flexlayout__tab_button--selected") {
+                    //             className = "override__tab_button--selected";
+                    //         }
+                    //         return className;
+                    //     }
+                    // }
+                    // i18nMapper = {
+                    //     (id, param?) => {
+                    //         if (id === I18nLabel.Move_Tab) {
+                    //             return `move this tab: ${param}`;
+                    //         } else if (id === I18nLabel.Move_Tabset) {
+                    //             return `move this tabset`
+                    //         }
+                    //         return undefined;
+                    //     }
+                    // }
             />;
         }
 
         return (
             // commented out strictmode until: extra effect in strict mode is fixed see: https://github.com/facebook/react/issues/29585
-            // <React.StrictMode> 
-                <ContextExample.Provider value="from context">
-                    <div className="app">
-                        <div className="toolbar" dir="ltr">
-                            <select className="toolbar_control" onChange={this.onSelectLayout}>
-                                <option value="default">Default</option>
-                                <option value="newfeatures">New Features</option>
-                                <option value="simple">Simple</option>
-                                <option value="mosaic">Mosaic Style</option>
-                                <option value="sub">SubLayout</option>
-                                <option value="complex">Complex</option>
-                            </select>
+            // <React.StrictMode>
+            <ContextExample.Provider value="from context">
+                <div className="app">
+                    <div className="toolbar" dir="ltr">
+                        <select className="toolbar_control" onChange={this.onSelectLayout}>
+                            <option value="default">Default</option>
+                            <option value="newfeatures">New Features</option>
+                            <option value="simple">Simple</option>
+                            <option value="mosaic">Mosaic Style</option>
+                            <option value="sub">SubLayout</option>
+                            <option value="complex">Complex</option>
+                        </select>
                             <button className="toolbar_control" onClick={this.onReloadFromFile} style={{ marginLeft: 5 }}>Reload</button>
-                            <div style={{ flexGrow: 1 }}></div>
-                            <span style={{ fontSize: "14px" }}>Realtime resize</span>
+                        <div style={{ flexGrow: 1 }}></div>
+                        <span style={{ fontSize: "14px" }}>Realtime resize</span>
                             <input
                                 name="realtimeResize"
                                 type="checkbox"
                                 checked={this.state.realtimeResize}
                                 onChange={this.onRealtimeResize} />
-                            <span style={{ marginLeft:5, fontSize: "14px" }}>Show layout</span>
+                        <span style={{ marginLeft: 5, fontSize: "14px" }}>Show layout</span>
                             <input
                                 name="show layout"
                                 type="checkbox"
@@ -493,43 +482,43 @@ class App extends React.Component<any, {
                             <select className="toolbar_control" style={{ marginLeft: 5 }}
                                 onChange={this.onFontSizeChange}
                                 defaultValue="medium">
-                                <option value="xx-small">Size xx-small</option>
-                                <option value="x-small">Size x-small</option>
-                                <option value="small">Size small</option>
-                                <option value="medium">Size medium</option>
-                                <option value="large">Size large</option>
-                                <option value="8px">Size 8px</option>
-                                <option value="10px">Size 10px</option>
-                                <option value="12px">Size 12px</option>
-                                <option value="14px">Size 14px</option>
-                                <option value="16px">Size 16px</option>
-                                <option value="18px">Size 18px</option>
-                                <option value="20px">Size 20px</option>
-                                <option value="25px">Size 25px</option>
-                                <option value="30px">Size 30px</option>
-                            </select>
-                            <select className="toolbar_control" style={{ marginLeft: 5 }} defaultValue="light" onChange={this.onThemeChange}>
-                                <option value="light">Light</option>
-                                <option value="underline">Underline</option>
-                                <option value="gray">Gray</option>
-                                <option value="dark">Dark</option>
-                                <option value="rounded">Rounded</option>
-                            </select>
-                            {/* <button className="toolbar_control" style={{ marginLeft: 5 }} onClick={this.onNewWindow}>New Window</button> */}
+                            <option value="xx-small">Size xx-small</option>
+                            <option value="x-small">Size x-small</option>
+                            <option value="small">Size small</option>
+                            <option value="medium">Size medium</option>
+                            <option value="large">Size large</option>
+                            <option value="8px">Size 8px</option>
+                            <option value="10px">Size 10px</option>
+                            <option value="12px">Size 12px</option>
+                            <option value="14px">Size 14px</option>
+                            <option value="16px">Size 16px</option>
+                            <option value="18px">Size 18px</option>
+                            <option value="20px">Size 20px</option>
+                            <option value="25px">Size 25px</option>
+                            <option value="30px">Size 30px</option>
+                        </select>
+                        <select className="toolbar_control" style={{ marginLeft: 5 }} defaultValue="light" onChange={this.onThemeChange}>
+                            <option value="light">Light</option>
+                            <option value="underline">Underline</option>
+                            <option value="gray">Gray</option>
+                            <option value="dark">Dark</option>
+                            <option value="rounded">Rounded</option>
+                        </select>
+                        {/* <button className="toolbar_control" style={{ marginLeft: 5 }} onClick={this.onNewWindow}>New Window</button> */}
                             <button className="toolbar_control" style={{ marginLeft: 5 }} onClick={this.onShowLayoutClick}>Show Layout JSON in Console</button>
                             <button className="toolbar_control drag-from" draggable={true}
-                                style={{ height: "30px", marginLeft: 5, border: "none", outline: "none" }}
-                                title="Add tab by starting a drag on a draggable element"
+                            style={{ height: "30px", marginLeft: 5, border: "none", outline: "none" }}
+                            title="Add tab by starting a drag on a draggable element"
                                 onDragStart={this.onDragStart}>
-                                Add Drag
-                            </button>
+                            Add Drag
+                        </button>
                             <button className="toolbar_control" disabled={this.state.adding} style={{ marginLeft: 5 }} title="Add using Layout.addTabToActiveTabSet" onClick={this.onAddActiveClick}>Add Active</button>
                         </div>
                         <div className={"contents" + (this.state.showLayout? " showLayout":"")}>
                             {contents}
-                        </div>
                     </div>
-                </ContextExample.Provider>
+                </div>
+            </ContextExample.Provider>
             //</React.StrictMode>
         );
     }
@@ -576,13 +565,13 @@ class SimpleTable extends React.Component<{ fields: any, node: Node, data: any, 
         }
 
         return <table className="simple_table"
-        // draggable={true} 
-        // onDragStart={(e) => this.props.onDragStart(e, this.props.node)}
-        >
-            <tbody>
-                <tr>{headercells}</tr>
-                {rows}
-            </tbody>
+                // draggable={true}
+                // onDragStart={(e) => this.props.onDragStart(e, this.props.node)}
+            >
+                <tbody>
+                    <tr>{headercells}</tr>
+                    {rows}
+                </tbody>
         </table>;
     }
 }
