@@ -26,6 +26,8 @@
     "scripts": {
         "open": "open http://localhost:8080/examples/demo/",
         "pretty": "prettier --write .",
+        "pack": "pnpm pack",
+        "send-to-cushy": "pnpm pack && cp flexlayout-react-0.8.1.tgz ../CushyStudio/src",
         "start": "webpack serve",
         "build": "npm run css && npm run doc && npm run build:esm",
         "build:esm": "tsc -p tsconfig2.json",
@@ -37,8 +39,8 @@
     "repository": "https://github.com/caplin/FlexLayout",
     "license": "ISC",
     "peerDependencies": {
-        "react": "^18.0.0",
-        "react-dom": "^18.0.0"
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
     },
     "eslintConfig": {
         "extends": "react-app"
