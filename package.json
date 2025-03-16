@@ -24,6 +24,7 @@
         "docking layout"
     ],
     "scripts": {
+        "eslint-fixall": "eslint src/ --fix",
         "open": "open http://localhost:8080/examples/demo/",
         "pretty": "prettier --write .",
         "pack": "pnpm pack",
