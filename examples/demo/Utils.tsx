@@ -1,4 +1,4 @@
-import { NOTNULL } from "./NOTNULL";
+import { NOTNULL } from "../../src/NOTNULL";
 
 export class Utils {
 
